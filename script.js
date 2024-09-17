@@ -1,90 +1,74 @@
-let boxes = document.querySelectorAll(".box");
-let reset = document.querySelector("#reset-btn");
-let newbtn = document.querySelector("#new-btn");
-let msgContainer = document.querySelector(".msg-container");
+let userScore = 0;
+let computerScore = 0;
 let msg = document.querySelector("#msg");
-let count = 0;
+const choices = document.querySelectorAll('.choice');
 
-let turnO = true;
-const winPatterns = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-];
+const genCompChoice = () => {
+    const options = ["rock","paper","scissors"];
+    return options[Math.floor(Math.random()*3)];
+}
 
-boxes.forEach((box) => {
-    box.addEventListener("click",()=>{
-        if(turnO){
-            box.innerText = "O";
-            turnO = false;
+
+const draw = () =>{
+    console.log("game was draw");
+    msg.innerText = 'Game was draw';
+    msg.style.backgroundColor = '#081b31';
+}
+
+const showwinner= (userchoice,cmpchoice,userwin) =>{
+    if(userwin){
+        console.log("you won");
+        msg.innerText = `You won! Your ${userchoice} beats ${cmpchoice}`;
+        msg.style.backgroundColor = 'green';
+        userScore++;
+        document.querySelector('#user-score').innerText = userScore;
+    }else{
+        console.log("you lose");
+        msg.innerText = `You lose! ${cmpchoice} beats your ${userchoice}`;
+        msg.style.backgroundColor = 'red';
+        computerScore++;
+        document.querySelector('#computer-score').innerText = computerScore;
+    }
+    if(userScore == 10 || computerScore == 10){
+        if(userScore == 10){
+            alert("You won the game");
         }else{
-            box.innerText = "X";
-            turnO = true;
+            alert("You lose the game");
         }
-        count++;
-        box.disabled = true;
-        let win = checkwin();
-        if(count==9 &&!win){
-            gamedraw();
-        }
-    });
-});
-
-
-
-const gamedraw = () =>{
-    msg.innerText = "The Game was Draw";
-    msgContainer.classList.remove("hide");
-    disableboxes();
-}
-const resetGame = () => {
-    turnO = true;
-    count = 0;
-    enableboxes();
-    msgContainer.classList.add("hide");
-}
-
-const enableboxes = () => {
-    for( let box of boxes){
-       box.disabled = false;
-       box.innerText = '';
+        userScore = 0;
+        computerScore = 0;
+        document.querySelector('#user-score').innerText = 0;
+        document.querySelector('#computer-score').innerText = 0;
+        document.querySelector('#msg').innerText = "Play your Move to display result";
+        msg.style.backgroundColor = '#081b31';
     }
 }
-const disableboxes = () => {
-     for( let box of boxes){
-        box.disabled = true;
-     }
-}
-
-
-
-const showWin = (winner) =>{
-    msg.innerText = `Congratulations,Winner is ${winner}`;
-    msgContainer.classList.remove("hide");
-    disableboxes();
-}
-
-const checkwin = () =>{
-    for(let pattern of winPatterns){
-        let a = boxes[pattern[0]].innerText;
-        let b = boxes[pattern[1]].innerText;
-        let c = boxes[pattern[2]].innerText;
-        if(a!=""&&b!=""&&c!=""){
-            if(a==b&&b==c){
-                console.log("Winner is",a);
-                showWin(a);
-                return true;
-            }
+const playgame = (userchoice) =>{
+    console.log("user choosed "+userchoice);
+    //computer choice
+    const cmpchoice = genCompChoice();
+    console.log("Computer choosed "+cmpchoice);
+    if(userchoice === cmpchoice){
+        draw();
+    }else{
+        let userwin = true;
+        if(userchoice=="rock"&&cmpchoice=="scissors"){
+            userwin = true;
+        }else if(userchoice=="paper"&&cmpchoice=="rock"){
+            userwin = true;
+        }else if(userchoice=="scissors"&&cmpchoice=="paper"){
+            userwin = true;
+        }else{
+            userwin = false;
         }
-    } 
+        showwinner(userchoice,cmpchoice,userwin);
+    }
 }
+choices.forEach((choice) => {    
+    choice.addEventListener('click', () => {
+        console.log(choice.id);
+        playgame(choice.id);
+    })
+})
 
 
-
-reset.addEventListener("click",resetGame);
-newbtn.addEventListener("click",resetGame);
